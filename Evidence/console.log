@@ -1,0 +1,87 @@
+(clearwing) shigeki@shigekinoMacBook-Air clearwing % clearwing sourcehunt target/WebGoat/src/main/java/org/owasp/webgoat/lessons/authbypass/ --depth deep
+LLM endpoint: claude-sonnet-4-6 via https://api.anthropic.com (source: config)
+Sourcehunt: target/WebGoat/src/main/java/org/owasp/webgoat/lessons/authbypass/ depth=deep budget=unlimited
+INFO: Sourcehunt session sh-1f30983e starting on target/WebGoat/src/main/java/org/owasp/webgoat/lessons/authbypass/
+INFO: Preprocessor: running static analyzer
+INFO: Preprocessor: static analyzer complete (0 findings)
+INFO: Preprocessor: enumerating source files
+INFO: Preprocessor: found 3 source files
+INFO: propagate_reachability=True but no callgraph; skipping
+INFO: Preprocessor enumerated 3 files
+INFO: Initializing HunterSandbox for /Users/shigeki/Desktop/Clearwing/clearwing/target/WebGoat/src/main/java/org/owasp/webgoat/lessons/authbypass languages=java
+INFO: HunterSandbox ready image=clearwing-sourcehunt:7dfadc0559c0
+INFO: Ranker starting on 3 files
+INFO: Ranker chunk 1/1 starting (3 files)
+INFO: Ranker chunk 1/1 completed in 7.3s
+INFO: Ranker progress 1/1 chunks completed
+INFO: Ranker completed
+INFO: HarnessGenerator: no eligible files
+INFO: Harness generator produced 0 crashes from 0 harnesses
+INFO: HunterPool starting on 3 files
+INFO: HunterPool dispatching 3 tiered file tasks
+INFO: Hunter starting for AuthBypass.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for AuthBypass.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for AuthBypass.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for VerifyAccount.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for VerifyAccount.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for AccountVerificationHelper.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for AccountVerificationHelper.java (tier=A cost_limit=25.00)
+INFO: Hunter finished for AccountVerificationHelper.java after 7 steps findings=1
+INFO: Hunter completed for AccountVerificationHelper.java findings=1 cost=0.1980 stop=completed
+INFO: Hunter finished for VerifyAccount.java after 7 steps findings=1
+INFO: Hunter completed for VerifyAccount.java findings=1 cost=0.2310 stop=completed
+INFO: Hunter finished for AuthBypass.java after 8 steps findings=1
+INFO: Hunter completed for AuthBypass.java findings=1 cost=0.2667 stop=completed
+INFO: Hunter finished for VerifyAccount.java after 9 steps findings=1
+INFO: Hunter completed for VerifyAccount.java findings=1 cost=0.3560 stop=completed
+INFO: Hunter finished for AccountVerificationHelper.java after 8 steps findings=1
+INFO: Hunter completed for AccountVerificationHelper.java findings=1 cost=0.3162 stop=completed
+INFO: Hunter finished for AuthBypass.java after 11 steps findings=1
+INFO: Hunter completed for AuthBypass.java findings=1 cost=0.3975 stop=completed
+INFO: Hunter finished for AuthBypass.java after 10 steps findings=1
+INFO: Hunter completed for AuthBypass.java findings=1 cost=0.3403 stop=completed
+INFO: HunterPool result statuses: {'completed': 7}
+INFO: HunterPool finished: completed=7 findings=7 spent_tier={'A': 2.1057930000000002, 'B': 0.0, 'C': 0.0} spent_band={'fast': 0.0, 'standard': 2.1057930000000002, 'deep': 0.0} promotions={'fast→standard': 0, 'standard→deep': 0}
+INFO: HunterPool completed with 7 findings
+WARNING: Behavior alert [warning]: network_access_attempt matched 'curl '
+WARNING: Behavior monitor: 1 alerts — {'network_access_attempt': 1}
+INFO: Persisted 7 findings to historical DB
+
+
+INFO: Variant loop: 14 patterns, 4 matches surfaced
+
+INFO: Hunter finished for AccountVerificationHelper.java after 10 steps findings=1
+INFO: Hunter finished for AccountVerificationHelper.java after 10 steps findings=1
+INFO: Hunter finished for AccountVerificationHelper.java after 9 steps findings=1
+INFO: Hunter finished for VerifyAccount.java after 12 steps findings=1
+INFO: Hunter finished for AccountVerificationHelper.java after 11 steps findings=1
+INFO: Hunter finished for AccountVerificationHelper.java after 9 steps findings=1
+INFO: Hunter finished for AccountVerificationHelper.java after 8 steps findings=1
+INFO: Committed 7 findings to commitment log
+
+Sourcehunt complete
+  Session: sh-1f30983e
+  Duration: 1553.8s
+  Files ranked: 3
+  Files hunted: 3
+  Findings: 11 (7 verified)
+  Critical: 7, High: 0
+  Spend: $2.1058
+    A=$2.1058  B=$0.0000  C=$0.0000
+  Outputs:
+    sarif: results/sourcehunt/sh-1f30983e/findings.sarif
+    markdown: results/sourcehunt/sh-1f30983e/report.md
+    json: results/sourcehunt/sh-1f30983e/findings.json
+    manifest: results/sourcehunt/sh-1f30983e/manifest.json
+
+Top findings:
+  [CRITICAL] AccountVerificationHelper.java:57 — The `verifyAccount` method contains a logic flaw that allows complete
+authentica
+  [CRITICAL] VerifyAccount.java:58 — The verifyAccount() method in AccountVerificationHelper.java contains a broken c
+  [CRITICAL] AccountVerificationHelper.java:57 — The verifyAccount() method performs security-question verification using a
+flawe
+  [CRITICAL] AccountVerificationHelper.java:57 — The verifyAccount() method checks that the submitted map has exactly 2
+entries (
+  [CRITICAL] AccountVerificationHelper.java:57 — The `verifyAccount()` method enforces two independent guards: first it checks
+th
+(clearwing) shigeki@shigekinoMacBook-Air clearwing %

@@ -1,0 +1,17 @@
+{
+  "session_id": "sh-1f30983e",
+  "repo_url": "target/WebGoat/src/main/java/org/owasp/webgoat/lessons/authbypass/",
+  "finding_count": 11,
+  "verified_count": 7,
+  "spent_per_tier": {
+    "A": 2.1057930000000002,
+    "B": 0.0,
+    "C": 0.0
+  },
+  "total_spent": 2.1057930000000002,
+  "outputs": {
+    "sarif": "results/sourcehunt/sh-1f30983e/findings.sarif",
+    "markdown": "results/sourcehunt/sh-1f30983e/report.md",
+    "json": "results/sourcehunt/sh-1f30983e/findings.json"
+  }
+}

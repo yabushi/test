@@ -1,0 +1,245 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "clearwing-sourcehunt",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "CWE-287",
+              "shortDescription": {
+                "text": "The `verifyAccount` method contains a logic flaw that allows complete authentication bypass without knowing any security question answers. The method only checks whether submitted keys are *wrong* \u2014 it never enforces that the *correct* keys are *present*. The only hard check is that the submitted map has the same number of entries as the stored question map (line 59). After passing that size check, each individual question guard (lines 63\u201374) starts with `containsKey(\"secQuestionX\")`: if the attacker omits those keys entirely (submitting arbitrary keys instead), `containsKey` returns false and the guard short-circuits, silently skipping the answer comparison. The method then falls through to `return true` at line 78, granting full verification to the account without any correct answer being validated."
+              },
+              "fullDescription": {
+                "text": "evidence_level: exploit_demonstrated\n\ndiscovered_by: hunter:unconstrained\n\ncrash:\nCompiled and executed TestBypass.java against a faithful replica of the method. Output: \"[Case 3] BYPASS (no real answers, arbitrary keys): true\" \u2014 authentication succeeds with zero correct answers.\n\nverifier_pro: The logic flaw is unambiguous and confirmed by static analysis of the actual code: the containsKey guard creates a conditional that only returns false when the key IS present AND the answer is wrong \u2014 it never enforces that the key must be present. Submitting N arbitrary keys of the correct count bypasses all answer validation and reaches return true, constituting complete authentication bypass with zero correct answers.\n\nverifier_counter: This appears to be WebGoat or a similar intentionally vulnerable training application, which means the vulnerability may be a deliberate teaching exercise rather than an accidental bug. In a production context, the attack surface depends on whether this endpoint is exposed and whether userId/verifyUserId validation is properly handled elsewhere.\n\nstability: stable (100% reproduction)"
+              }
+            },
+            {
+              "id": "CWE-290",
+              "shortDescription": {
+                "text": "The verifyAccount() method in AccountVerificationHelper.java contains a broken security-question authentication logic that allows a complete authentication bypass without knowing any correct answer.\n\nROOT CAUSE \u2014 Absent-key short-circuit:\nThe method checks each security question only when the submitted map *contains* that key:\n\n    if (submittedQuestions.containsKey(\"secQuestion0\")\n        && !submittedQuestions.get(\"secQuestion0\").equals(...)) {\n        return false;\n    }\n\nIf a submitted map contains the *right number of entries* but uses **different key names** (e.g. \"secQuestion2\" and \"secQuestion3\" instead of \"secQuestion0\" and \"secQuestion1\"), both `containsKey` guards return `false`. Neither rejection branch is ever entered, so the method falls through and returns `true` \u2014 granting authentication.\n\nThe anti-cheat guard (`didUserLikelylCheat`) detects only *correct* answers for the real keys, so it also returns `false` for the bypass payload, meaning the attacker is not blocked at any point.\n\nPROOF-OF-CONCEPT (HTTP POST to /auth-bypass/verify-account):\n    userId=1223445&verifyMethod=SEC_QUESTIONS&secQuestion2=anything&secQuestion3=anything\n\nSubmitted map: {\"secQuestion2\":\"anything\",\"secQuestion3\":\"anything\"}\n  - Size check:  2 == 2  \u2192 passes (not short-circuited)\n  - secQuestion0 check: containsKey(\"secQuestion0\") == false \u2192 skipped\n  - secQuestion1 check: containsKey(\"secQuestion1\") == false \u2192 skipped\n  - return true  \u2190 authentication granted with no correct answers\n\nIMPACT: An unauthenticated attacker can fully bypass the account-verification step for user ID 1223445 and take over that account session without knowing any security-question answer."
+              },
+              "fullDescription": {
+                "text": "evidence_level: exploit_demonstrated\n\ndiscovered_by: hunter:unconstrained\n\nverifier_pro: The flaw is unambiguous: the containsKey guard pattern means any submitted map with the correct number of entries but wrong key names will bypass all answer validation. The PoC is straightforward and directly follows from the code logic, with no speculative steps required.\n\nverifier_counter: This is WebGoat, a deliberately vulnerable training application \u2014 the flaw is intentional (note the comment on line 55: 'Can you find the flaw?'). In a real production deployment this would be critical, but the impact is limited to users of the intentionally vulnerable app."
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CWE-287",
+          "level": "error",
+          "message": {
+            "text": "The `verifyAccount` method contains a logic flaw that allows complete authentication bypass without knowing any security question answers. The method only checks whether submitted keys are *wrong* \u2014 it never enforces that the *correct* keys are *present*. The only hard check is that the submitted map has the same number of entries as the stored question map (line 59). After passing that size check, each individual question guard (lines 63\u201374) starts with `containsKey(\"secQuestionX\")`: if the attacker omits those keys entirely (submitting arbitrary keys instead), `containsKey` returns false and the guard short-circuits, silently skipping the answer comparison. The method then falls through to `return true` at line 78, granting full verification to the account without any correct answer being validated."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-287",
+          "level": "error",
+          "message": {
+            "text": "The verifyAccount() method in AccountVerificationHelper.java contains a broken conditional logic flaw that allows complete authentication bypass without knowing any security-question answers. The method checks the submitted map size equals the expected number of questions (2), then uses `containsKey(\"secQuestion0\")` / `containsKey(\"secQuestion1\")` guards before checking the actual answer values. Because those guards are AND-combined with the incorrect-answer check using &&, if the attacker submits two entries that do NOT use the keys \"secQuestion0\" or \"secQuestion1\" (e.g., \"secQuestion2\" and \"secQuestion3\"), neither guard is true, neither rejection branch fires, and the method falls through to `return true` \u2014 granting full account access. The anti-cheat check `didUserLikelylCheat()` is also bypassed because it only sets `likely = true` when the real correct answers are submitted; arbitrary-key submissions make it return false, so the cheat gate passes too."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "VerifyAccount.java"
+                },
+                "region": {
+                  "startLine": 58
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-287",
+          "level": "error",
+          "message": {
+            "text": "The verifyAccount() method performs security-question verification using a flawed conditional pattern: each check is only executed when containsKey() is true for the expected question key. An attacker can submit a request with completely different parameter names (e.g., secQuestion2=x&secQuestion3=y instead of secQuestion0 and secQuestion1). The size check (line 59) passes because the map contains 2 entries \u2014 matching the 2 entries in the store \u2014 but since secQuestion0 and secQuestion1 are absent, both validation blocks are skipped entirely, and the method returns true unconditionally, granting full authentication without knowing any correct answer."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-287",
+          "level": "error",
+          "message": {
+            "text": "The verifyAccount() method checks that the submitted map has exactly 2 entries (matching the expected security-question count), then uses \"if containsKey(X) && wrong \u2192 return false\" guards for each expected key. If neither expected key (secQuestion0, secQuestion1) is present, both guards are bypassed and the function unconditionally returns true. An attacker submits two arbitrary security-question parameters (e.g., secQuestion2 and secQuestion3 with any values) to satisfy the size check without triggering either guard, gaining full account verification with zero knowledge of the real answers. The anti-cheat check (didUserLikelylCheat) is also evaded because it only flags correct answers to the real questions."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-287",
+          "level": "error",
+          "message": {
+            "text": "The `verifyAccount()` method enforces two independent guards: first it checks that the submitted answer map has exactly as many entries as the stored questions (2), then it checks each answer with `containsKey()` before comparing values. Because the key check is used as an *optional gate* (\"only reject if the key is present AND the value is wrong\"), an attacker can submit any two parameters whose names contain \"secQuestion\" but are NOT \"secQuestion0\" or \"secQuestion1\" (e.g. \"secQuestion2\" and \"secQuestion3\"). The size check passes (2 == 2), but `containsKey(\"secQuestion0\")` and `containsKey(\"secQuestion1\")` both return false, so neither rejection branch is entered, and the method falls through to `return true` \u2014 granting full authentication without knowing any correct answer. The anti-cheat helper `didUserLikelylCheat()` also returns false for these inputs, so the bypass goes undetected."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "The verifyAccount() method in AccountVerificationHelper.java contains a broken security-question authentication logic that allows a complete authentication bypass without knowing any correct answer.\n\nROOT CAUSE \u2014 Absent-key short-circuit:\nThe method checks each security question only when the submitted map *contains* that key:\n\n    if (submittedQuestions.containsKey(\"secQuestion0\")\n        && !submittedQuestions.get(\"secQuestion0\").equals(...)) {\n        return false;\n    }\n\nIf a submitted map contains the *right number of entries* but uses **different key names** (e.g. \"secQuestion2\" and \"secQuestion3\" instead of \"secQuestion0\" and \"secQuestion1\"), both `containsKey` guards return `false`. Neither rejection branch is ever entered, so the method falls through and returns `true` \u2014 granting authentication.\n\nThe anti-cheat guard (`didUserLikelylCheat`) detects only *correct* answers for the real keys, so it also returns `false` for the bypass payload, meaning the attacker is not blocked at any point.\n\nPROOF-OF-CONCEPT (HTTP POST to /auth-bypass/verify-account):\n    userId=1223445&verifyMethod=SEC_QUESTIONS&secQuestion2=anything&secQuestion3=anything\n\nSubmitted map: {\"secQuestion2\":\"anything\",\"secQuestion3\":\"anything\"}\n  - Size check:  2 == 2  \u2192 passes (not short-circuited)\n  - secQuestion0 check: containsKey(\"secQuestion0\") == false \u2192 skipped\n  - secQuestion1 check: containsKey(\"secQuestion1\") == false \u2192 skipped\n  - return true  \u2190 authentication granted with no correct answers\n\nIMPACT: An unauthenticated attacker can fully bypass the account-verification step for user ID 1223445 and take over that account session without knowing any security-question answer."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "The verifyAccount() method enforces that exactly N (=2) parameters whose names start with \"secQuestion\" are submitted, but it only validates the answers when the map *contains* the canonical keys \"secQuestion0\" and \"secQuestion1\". Because the size check is done on the submitted map instead of checking that the submitted keys exactly match the expected keys, an attacker can supply two arbitrarily named keys such as \"secQuestion2\" and \"secQuestion99\". The size guard passes (2 == 2), but neither if-branch fires because containsKey(\"secQuestion0\") and containsKey(\"secQuestion1\") are both false, so the method falls through and returns true \u2014 full authentication bypass without knowing a single correct answer. The anti-cheat check (didUserLikelylCheat) is also bypassed because it returns false when the correct canonical keys are absent."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 57
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "Variant of hunter-75cd0946: Security question validation that uses containsKey on canonical key names after only a size check \u2014 allowing bypass by submitting arbitrary key names that pass the size guard but skip all answer validation branches"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 39
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "Variant of hunter-75cd0946: Security question validation that uses containsKey on canonical key names after only a size check \u2014 allowing bypass by submitting arbitrary key names that pass the size guard but skip all answer validation branches"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 43
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "Variant of hunter-75cd0946: Security question validation that uses containsKey on canonical key names after only a size check \u2014 allowing bypass by submitting arbitrary key names that pass the size guard but skip all answer validation branches"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 63
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CWE-290",
+          "level": "error",
+          "message": {
+            "text": "Variant of hunter-75cd0946: Security question validation that uses containsKey on canonical key names after only a size check \u2014 allowing bypass by submitting arbitrary key names that pass the size guard but skip all answer validation branches"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "AccountVerificationHelper.java"
+                },
+                "region": {
+                  "startLine": 70
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

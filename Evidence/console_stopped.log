@@ -1,0 +1,57 @@
+(clearwing) shigeki@shigekinoMacBook-Air clearwing % clearwing sourcehunt target/WebGoat --depth deep
+LLM endpoint: claude-sonnet-4-6 via https://api.anthropic.com (source: config)
+Sourcehunt: target/WebGoat depth=deep budget=unlimited
+INFO: Sourcehunt session sh-0d41042a starting on target/WebGoat
+INFO: Preprocessor: running static analyzer
+INFO: Preprocessor: static analyzer complete (121 findings)
+INFO: Preprocessor: enumerating source files
+INFO: Preprocessor: found 1196 source files
+INFO: Preprocessor enumerated 485 files
+INFO: Initializing HunterSandbox for /Users/shigeki/Desktop/Clearwing/clearwing/target/WebGoat languages=java,javascript
+INFO: Building sourcehunt sandbox image clearwing-sourcehunt:7dfadc0559c0 (sanitizers=asan,ubsan)
+INFO: HunterSandbox ready image=clearwing-sourcehunt:7dfadc0559c0
+INFO: Ranker starting on 485 files
+INFO: Ranker chunk 1/4 starting (150 files)
+INFO: Ranker chunk 2/4 starting (150 files)
+INFO: Ranker chunk 3/4 starting (150 files)
+INFO: Ranker chunk 4/4 starting (35 files)
+INFO: Ranker chunk 4/4 completed in 55.9s
+INFO: Ranker progress 1/4 chunks completed
+INFO: Ranker chunk 1/4 completed in 159.8s
+INFO: Ranker progress 2/4 chunks completed
+INFO: Ranker chunk 2/4 completed in 171.2s
+INFO: Ranker progress 3/4 chunks completed
+INFO: Ranker chunk 3/4 completed in 193.7s
+INFO: Ranker progress 4/4 chunks completed
+INFO: Ranker completed
+INFO: HarnessGenerator: no eligible files
+INFO: Harness generator produced 0 crashes from 0 harnesses
+INFO: HTTP Request: GET https://chroma-onnx-models.s3.amazonaws.com/all-MiniLM-L6-v2/onnx.tar.gz "HTTP/1.1 200 OK"
+/Users/shigeki/.cache/chroma/onnx_models/all-MiniLM-L6-v2/onnx.tar.gz: 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 79.3M/79.3M [00:38<00:00, 2.15MiB/s]
+INFO: HunterPool starting on 485 files
+INFO: HunterPool dispatching 485 tiered file tasks
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/xxe/SimpleXXE.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/xxe/SimpleXXE.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/xxe/SimpleXXE.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/jwt/JWTDecodeEndpoint.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/jwt/JWTDecodeEndpoint.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/lessons/jwt/JWTDecodeEndpoint.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/container/WebSecurityConfig.java (tier=A cost_limit=25.00)
+INFO: Hunter starting for src/main/java/org/owasp/webgoat/container/WebSecurityConfig.java (tier=A cost_limit=25.00)
+INFO: Hunter finished for src/main/java/org/owasp/webgoat/lessons/xxe/SimpleXXE.java after 13 steps findings=2
+INFO: Hunter completed for src/main/java/org/owasp/webgoat/lessons/xxe/SimpleXXE.java findings=2 cost=0.6629 stop=completed
+INFO: Hunter starting for src/main/resources/lessons/xss/js/assignment4.js (tier=A cost_limit=25.00)
+^C^C^C
+Sourcehunt cancelled by user
+^CException ignored in: <module 'threading' from '/Users/shigeki/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/threading.py'>
+Traceback (most recent call last):
+  File "/Users/shigeki/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/threading.py", line 1594, in _shutdown
+    atexit_call()
+  File "/Users/shigeki/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/concurrent/futures/thread.py", line 31, in _python_exit
+    t.join()
+  File "/Users/shigeki/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/threading.py", line 1149, in join
+    self._wait_for_tstate_lock()
+  File "/Users/shigeki/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/threading.py", line 1169, in _wait_for_tstate_lock
+    if lock.acquire(block, timeout):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt:
